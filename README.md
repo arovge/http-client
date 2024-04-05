@@ -4,6 +4,7 @@ An ergonomic wrapper around Foundation's URLSession
 
 Feature roadmap:
 
+- [x] Basic implementation
 - [ ] Multi part file upload
 - [ ] Cooperative task cancellation
 - [ ] Add custom headers
