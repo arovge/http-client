@@ -11,6 +11,7 @@ Feature roadmap:
 
 Project roadmap:
 
+- [ ] CI (build/test/fmt)
 - [ ] Tests (using [swift-testing](https://github.com/apple/swift-testing))
   - [ ] Unit
   - [ ] Integration/E2E
