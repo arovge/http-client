@@ -34,11 +34,29 @@ public enum HTTPClientError: Error {
     case encodingError(Error)
 }
 
+public struct HTTPClientHeaders {
+    let referer: String?
+    let userAgent: String?
+
+    public init(
+        referer: String? = nil,
+        userAgent: String? = nil
+    ) {
+        self.referer = referer
+        self.userAgent = userAgent
+    }
+}
+
 public class HTTPClient {
     let encoder = JSONEncoder()
     let decoder = JSONDecoder()
+    let defaultHeaders: HTTPClientHeaders
 
-    public init() {}
+    public init(
+        defaultHeaders: HTTPClientHeaders = HTTPClientHeaders()
+    ) {
+        self.defaultHeaders = defaultHeaders
+    }
 
     public func request<
         Response: Decodable,
@@ -46,12 +64,14 @@ public class HTTPClient {
     >(
         _ method: HTTPMethod,
         _ url: URL,
-        body: Body? = nil
+        body: Body? = nil,
+        includeDefaultHeaders: Bool = true
     ) async throws -> Response {
         let (data, _) = try await sendRequest(
             method,
             url,
-            body: body
+            body: body,
+            includeDefaultHeaders: includeDefaultHeaders
         )
         return try decode(data)
     }
@@ -59,9 +79,11 @@ public class HTTPClient {
     func sendRequest<Body: Encodable>(
         _ method: HTTPMethod,
         _ url: URL,
-        body: Body? = nil
+        body: Body?,
+        includeDefaultHeaders: Bool
     ) async throws -> (Data, URLResponse) {
         var request = URLRequest(url: url)
+        addDefaultHeaders(to: &request)
         request.httpMethod = method.description
         request.httpBody = if let body {
             try encode(body)
@@ -77,6 +99,16 @@ public class HTTPClient {
         } catch {
             // TODO: More specific error requests based on what URLSession threw
             throw HTTPClientError.requestFailed(error)
+        }
+    }
+
+    func addDefaultHeaders(to request: inout URLRequest) {
+        if let referer = defaultHeaders.referer {
+            request.addValue(referer, forHTTPHeaderField: "Referer")
+        }
+
+        if let userAgent = defaultHeaders.userAgent {
+            request.addValue(userAgent, forHTTPHeaderField: "User-Agent")
         }
     }
 

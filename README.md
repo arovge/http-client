@@ -7,7 +7,8 @@ Feature roadmap:
 - [x] Basic implementation
 - [ ] Multi part file upload
 - [ ] Cooperative task cancellation
-- [ ] Add custom headers
+- [x] Add custom headers
+- [ ] Logging
 - [ ] JWT refresh logic
 
 Project roadmap:
